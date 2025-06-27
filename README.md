@@ -1,1 +1,1 @@
-"SecureVault Password Manager" 
+# SecureVault Password Manager
