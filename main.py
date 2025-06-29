@@ -21,7 +21,7 @@ def main(master):
                     
                     if(y == '1'):
                         readVault()
-                        print('')
+                        print()
                     
                     elif(y == '2'):
                         t = ''
@@ -29,12 +29,17 @@ def main(master):
                         
                         while t != '0':
                             t = input("Enter a service, username, password, pressing enter after each. Enter 0 when you're done. ")
-                            if t != '0':
+                            if t != '0' and len(users) < 3 and t.strip() != '':
                                 users.append(t)
+                            else:
+                                print('Either you already completed the record, or you tried to add an empty string. ')
+                                t = '0'
+                                
                             print(users)
                             print()
                             
-                        storeInVault(users)
+                        if users:
+                            storeInVault(users)
                     
                     elif(y == '3'):
                         break
