@@ -1,6 +1,6 @@
 from pickle import *
 
-def storeInVault(users):
+def storeInVault(users: list):
     with open('pwd.vault', 'ab') as file:
         dump(users, file)
         
