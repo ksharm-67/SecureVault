@@ -1,11 +1,11 @@
 from pickle import *
 
 def storeInVault(users: list):
-    with open('pwd.vault', 'ab') as file:
+    with open('storage.vault', 'ab') as file:
         dump(users, file)
         
 def readVault():
-    with open('pwd.vault', 'rb') as file:
+    with open('storage.vault', 'rb') as file:
         
         while True:
             try:
@@ -18,12 +18,11 @@ def readVault():
         
 def checkVault():
     try:
-        with open('pwd.vault', 'rb') as file:
+        with open('storage.vault', 'rb') as file:
             load(file)
         return True
         
     except Exception as e:
         print("Exception: ", e)
-        storeInVault([])
         return False
         
