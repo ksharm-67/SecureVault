@@ -12,8 +12,8 @@ def main():
                 masterContents = firstSetup(newPass)
                 pwdDump(masterContents)
                 
-                print('Vault was missing, created another one! ')
-                storeInVault([])
+                print('Vault was missing, created a new one! ')
+                createVault()
                 
             else:
                 masterContents = loadPwd()
@@ -21,32 +21,64 @@ def main():
             entered = input("Enter master password or enter 0 to exit: ")
 
             #Check if file exists. If not, create Master Password, else ask user for it
-            if(verifyPass(entered, bytes.fromhex(masterContents[0]), bytes.fromhex(masterContents[1]), masterContents[2])):
+            if(verifyPass(entered, masterContents[0], masterContents[1], masterContents[2])):
                 flag2 = True
                 
                 while(flag2):
                     print("Hello! What do you want to do today? ")                    
-                    y = input("1 to read, 2 to write, 3 to log out, 4 to check password contents: ")
+                    y = input("1 to find a password\n2 to store a password\n3 to log out\n4 to view all\n5 to change master password\n6 to delete a password: ")
                     
                     if(y == '1'):
-                        readVault()
-                        print()
-                    
-                    elif(y == '2'):
-                        t = ''
-                        users = []
+                        service = input("Which service? ")
                         
-                        while t != '0':
-                            t = input("Enter a service, username, password, pressing enter after each. Enter 0 when you're done. ")
-                            if t != '0' and len(users) < 3 and t.strip() != '':
-                                users.append(t)
-                            else:
-                                print('Either you already completed the record, or you tried to add an empty string. ')
-                                t = '0'
-                                
-                            print(users)
+                        if service.strip() != '':
+                            res = readVault(service)
                             print()
                             
+                            if res:
+                                for uname, pwd in res:
+                                    print(f"The password for your {service} account ({uname}) is: {pwd}")
+                                    
+                            else:
+                                print("This service does not exist ")
+                            
+                            print()
+                            
+                        else:
+                            print("You need to enter a service to view its password")
+                            continue
+                    
+                    elif(y == '2'):
+                        users = []          
+
+                        #Service prompt
+                        t = input("Enter a service or 0 to reset: ")
+                        if t.strip() != '' and t != '0':
+                            users.append(t)
+                        else:
+                            print('You tried to add an empty string. \n')
+                            continue
+
+                        #Username prompt                            
+                        u = input("Enter a username or 0 to reset: ")
+                        if u.strip() != '' and u != '0':
+                            users.append(u)
+                        else:
+                            print('You tried to add an empty string. \n')
+                            continue
+
+                        #Password prompt
+                        v = input("Enter a password or 0 to reset: ")
+                        if v.strip() != '' and v != '0':
+                            users.append(v)
+                        else:
+                            print('You exited the loop or you tried to add an empty string. \n')
+                            continue
+
+                            
+                        print(users)
+                        print()
+                        
                         if users:
                             storeInVault(users)
                     
@@ -54,7 +86,18 @@ def main():
                         flag2 = False
                         
                     elif(y == '4'):
-                        loadPwd()
+                        viewAll()
+                        print()
+                        
+                    elif(y == '5'):
+                        chgPwd = input('Setup your new master password: ')
+                        newMaster = firstSetup(chgPwd)
+                        pwdDump(newMaster)
+                        
+                    elif(y == '6'):
+                        toDel = input('Which account do you want to delete? Enter the full username: ')
+                        delRecord(toDel)
+                        print('Deleted!\n')
                     
                     else:
                         print('Error. Not an option' )
