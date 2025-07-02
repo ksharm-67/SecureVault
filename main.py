@@ -1,5 +1,6 @@
 from vault import *
-from crypto import * 
+from crypto import *
+from AESencryption import *
 
 def main():
     
@@ -9,8 +10,13 @@ def main():
         try:
             if not checkVault():
                 newPass = input('Setup your master password: ')
-                masterContents = firstSetup(newPass)
-                pwdDump(masterContents)
+                
+                if len(newPass) >= 8:
+                    masterContents = firstSetup(newPass)
+                    pwdDump(masterContents)
+                else:
+                    print('Password is too short. You need a minimum length of 8 characters')
+                    continue
                 
                 print('Vault was missing, created a new one! ')
                 createVault()
@@ -26,7 +32,7 @@ def main():
                 
                 while(flag2):
                     print("Hello! What do you want to do today? ")                    
-                    y = input("1 to find a password\n2 to store a password\n3 to log out\n4 to view all\n5 to change master password\n6 to delete a password: ")
+                    y = input("\n1 to find a password\n2 to store a password\n3 to delete a password:\n4 to view all\n5 to change master password\n6 to log out: ")
                     
                     if(y == '1'):
                         service = input("Which service? ")
@@ -37,7 +43,9 @@ def main():
                             
                             if res:
                                 for uname, pwd in res:
-                                    print(f"The password for your {service} account ({uname}) is: {pwd}")
+                                    masterList = loadPwd()
+                                    decodedPass = decryptPwd(pwd, entered, bytes.fromhex(masterList[0]))
+                                    print(f"The password for your {service} account ({uname}) is: {decodedPass}")
                                     
                             else:
                                 print("This service does not exist ")
@@ -70,9 +78,13 @@ def main():
                         #Password prompt
                         v = input("Enter a password or 0 to reset: ")
                         if v.strip() != '' and v != '0':
-                            users.append(v)
+                            masterConts = loadPwd()
+                            
+                            #Send the salt to encryptPwd to use for the encrypted key
+                            ctxt = encryptPwd(v, bytes.fromhex(masterConts[0]), entered)
+                            users.append(ctxt)
                         else:
-                            print('You exited the loop or you tried to add an empty string. \n')
+                            print('Error: You tried to add an empty string. \n')
                             continue
 
                             
@@ -83,21 +95,41 @@ def main():
                             storeInVault(users)
                     
                     elif(y == '3'):
-                        flag2 = False
+                        toDel = input('Which account do you want to delete? Enter the full username: ')
+                        if toDel.strip() != '':
+                            delRecord(toDel)
+                        else:
+                            print('Can\'t delete an empty string!\n')
+                            continue
+                        
+                        print('Deleted!\n')
+                        
                         
                     elif(y == '4'):
-                        viewAll()
+                        contentsMaster = loadPwd()
+                        viewAll(entered, bytes.fromhex(contentsMaster[0]))
                         print()
                         
                     elif(y == '5'):
                         chgPwd = input('Setup your new master password: ')
-                        newMaster = firstSetup(chgPwd)
+                        
+                        if len(chgPwd) >= 8:
+                            confirm = input('Confirm new master password: ')
+                        else:
+                            print('Your chosen password is too short!\n')
+                            continue
+                        
+                        if chgPwd == confirm:
+                            newMaster = firstSetup(chgPwd)
+                        else:
+                            print('Passwords do not match. Try again\n')
+                            continue
+                        
                         pwdDump(newMaster)
+                        print('Master password changed successfully!\n')
                         
                     elif(y == '6'):
-                        toDel = input('Which account do you want to delete? Enter the full username: ')
-                        delRecord(toDel)
-                        print('Deleted!\n')
+                        flag2 = False
                     
                     else:
                         print('Error. Not an option' )
