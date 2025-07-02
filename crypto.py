@@ -16,9 +16,9 @@ def firstSetup(pwd: str) -> list:
     return [salt.hex(), hashed.hex(), itr]
     
 def verifyPass(entered: str, salt: bytes, hashed: bytes, itr: int) -> bool:
-    newKey = pbkdf2_hmac('sha256', bytes(entered, 'utf-8'), salt, itr, dklen=64)
+    newKey = pbkdf2_hmac('sha256', bytes(entered, 'utf-8'), bytes.fromhex(salt), itr, dklen=64)
     
-    return hmac.compare_digest(newKey, hashed)
+    return hmac.compare_digest(newKey, bytes.fromhex(hashed))
     
 def pwdDump(pwd):
     with open('pass.vault', 'wb') as file:
@@ -33,10 +33,3 @@ def loadPwd():
             
             except Exception as e:
                 return None
-            
-
-# newSalt = firstSetup("kavish")
-# print(newSalt)
-# 
-# same = verifyPass("kavish", bytes.fromhex(newSalt[0]), bytes.fromhex(newSalt[1]), newSalt[2])
-# print(same)
