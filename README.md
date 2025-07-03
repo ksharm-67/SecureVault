@@ -53,7 +53,7 @@ python main.py
 
 You'll be prompted to log in or set up a new vault.
 
-####Options after login:
+#### Options after login:
 
 - Find a password for a given service
 
