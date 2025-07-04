@@ -1,6 +1,7 @@
 from vault import *
 from crypto import *
 from AESencryption import *
+from strength import *
 
 def main():
     
@@ -12,7 +13,15 @@ def main():
                 newPass = input('Setup your master password: ')
                 
                 if len(newPass) >= 8:
-                    masterContents = firstSetup(newPass)
+                    if checkStrength(newPass):
+                        masterContents = firstSetup(newPass)
+                    else:
+                        print('Your password is quite weak. It should have at least one number, uppercase letter, and special character\nContinue? (y/n)')
+                        if(input().lower() == 'y'):
+                            masterContents = firstSetup(newPass)
+                        else:
+                            continue
+                        
                     pwdDump(masterContents)
                 else:
                     print('Password is too short. You need a minimum length of 8 characters')
@@ -25,6 +34,7 @@ def main():
                 masterContents = loadPwd()
             
             entered = input("Enter master password or enter 0 to exit: ")
+            print()
 
             #Check if file exists. If not, create Master Password, else ask user for it
             if(verifyPass(entered, masterContents[0], masterContents[1], masterContents[2])):
@@ -43,8 +53,7 @@ def main():
                             
                             if res:
                                 for uname, pwd in res:
-                                    masterList = loadPwd()
-                                    decodedPass = decryptPwd(pwd, entered, bytes.fromhex(masterList[0]))
+                                    decodedPass = decryptPwd(pwd, entered, bytes.fromhex(masterContents[0]))
                                     print(f"The password for your {service} account ({uname}) is: {decodedPass}")
                                     
                             else:
@@ -78,10 +87,9 @@ def main():
                         #Password prompt
                         v = input("Enter a password or 0 to reset: ")
                         if v.strip() != '' and v != '0':
-                            masterConts = loadPwd()
                             
                             #Send the salt to encryptPwd to use for the encrypted key
-                            ctxt = encryptPwd(v, bytes.fromhex(masterConts[0]), entered)
+                            ctxt = encryptPwd(v, bytes.fromhex(masterContents[0]), entered)
                             users.append(ctxt)
                         else:
                             print('Error: You tried to add an empty string. \n')
@@ -106,15 +114,24 @@ def main():
                         
                         
                     elif(y == '4'):
-                        contentsMaster = loadPwd()
-                        viewAll(entered, bytes.fromhex(contentsMaster[0]))
+                        viewAll(entered, bytes.fromhex(masterContents[0]))
                         print()
                         
                     elif(y == '5'):
                         chgPwd = input('Setup your new master password: ')
                         
                         if len(chgPwd) >= 8:
+                            if checkStrength(chgPwd):
+                                pass
+                            else:
+                                print('Your password is quite weak. It should have at least one number, uppercase letter, and special character\nContinue? (y/n)')
+                                if(input().lower() == 'y'):
+                                    pass
+                                else:
+                                    continue
+                            
                             confirm = input('Confirm new master password: ')
+                            
                         else:
                             print('Your chosen password is too short!\n')
                             continue
