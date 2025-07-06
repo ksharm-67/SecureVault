@@ -2,6 +2,9 @@ from vault import *
 from crypto import *
 from AESencryption import *
 from strength import *
+from brute_force import *
+from pickle import *
+import os
 
 def main():
     
@@ -95,8 +98,6 @@ def main():
                             print('Error: You tried to add an empty string. \n')
                             continue
 
-                            
-                        print(users)
                         print()
                         
                         if users:
@@ -156,8 +157,16 @@ def main():
                 break
             
             else:
-                print('Wrong password')
-                    
+                if os.path.exists('attempts.vault'):
+                    with open('attempts.vault', 'rb') as f:
+                        data = load(f)
+                        numWrong = data.get('count', 0)
+                else:
+                    init_failed_login()
+                    numWrong = 0
+                
+                failedAttempt(entered, numWrong)
+                                    
         except Exception as e:
             print('Exception: ', e)
             break
