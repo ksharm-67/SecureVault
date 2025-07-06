@@ -43,7 +43,7 @@ crypto.py: Password hashing and master password verification
 
 AESencryption.py: AES-CBC encryption and decryption helpers
 
-entropy.py: To help calculate the randomness and security of the password
+strength.py: To help calculate the randomness and security of the master password
 
 brute_force.py: To help secure the vault against brute-force hacks
 
